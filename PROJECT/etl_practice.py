@@ -1,128 +1,124 @@
-# Code for ETL operations on Country-GDP data
-# Importing the required libraries
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 import numpy as np
 import sqlite3
 from datetime import datetime
- 
-def extract(url, table_attribs):
-    ''' The purpose of this function is to extract the required
-    information from the website and save it to a dataframe. The
-    function returns the dataframe for further processing. '''
-
-    response = requests.get(url)
-    data = BeautifulSoup(response.text, "html.parser")  # fixed here
-    df = pd.DataFrame(columns=table_attribs)
-    tables = data.find_all("tbody")
-    rows = tables[2].find_all("tr")
-
-    for row in rows:
-        col = row.find_all("td")
-        if len(col) >= 3 and col[0].find('a') is not None and '—' not in col[2]:
-            data_dict = {
-                "Country": col[0].a.contents[0],
-                "GDP_USD_millions": col[2].contents[0]
-            }
-            df1 = pd.DataFrame(data_dict, index=[0])
-            df = pd.concat([df, df1], ignore_index=True)
-    return df
-
-def transform(df):
-    ''' This function converts the GDP information from Currency
-    format to float value, transforms the information of GDP from
-    USD (Millions) to USD (Billions) rounding to 2 decimal places.
-    The function returns the transformed dataframe.'''
-    
-    GDP_list = df["GDP_USD_millions"].tolist()
-    GDP_list = [float("".join(el.split(","))) for el in GDP_list]
-    arr = np.array(GDP_list)
-    transformed_list = np.round(arr / 1000, 2)
-    df["GDP_USD_millions"] = transformed_list
-    df.rename(columns={"GDP_USD_millions": "GDP_USD_billions"}, inplace=True)
-
-    # Load and convert exchange rate file to dictionary
-    exchange_df = pd.read_csv("exchange_rate.csv")
-    exchange_rate = exchange_df.set_index('Currency').to_dict()['Rate']
-
-    # Add 3 new currency columns based on exchange rate
-    df["MC_GBP_Billion"] = [np.round(x * exchange_rate['GBP'], 2) for x in df["GDP_USD_billions"]]
-    df["MC_EUR_Billion"] = [np.round(x * exchange_rate['EUR'], 2) for x in df["GDP_USD_billions"]]
-    df["MC_INR_Billion"] = [np.round(x * exchange_rate['INR'], 2) for x in df["GDP_USD_billions"]]
-
-    return df
-
-def load_to_csv(df, csv_path):
-    ''' This function saves the final dataframe as a `CSV` file 
-    in the provided path. Function returns nothing.'''
-    df.to_csv(csv_path)
-
-def load_to_db(df, sql_connection, table_name):
-    ''' This function saves the final dataframe to as a database table
-    with the provided name. Function returns nothing.'''
-    df.to_sql(table_name, sql_connection, if_exists='replace', index=False)
-
-def run_query(query_statement, sql_connection):
-    ''' This function runs the stated query on the database table and
-    prints the output on the terminal. Function returns nothing. '''
-    print(query_statement)
-    query_output = pd.read_sql(query_statement, sql_connection)
-    print(query_output)
 
 def log_progress(message):
-    ''' This function logs the mentioned message at a given stage of the 
-    code execution to a log file. Function returns nothing.'''
+    ''' Logs a timestamped message to code_log.txt '''
     timestamp_format = "%Y-%m-%d %H:%M:%S"
     now = datetime.now()
     timestamp = now.strftime(timestamp_format)
-    with open("./etl_project_log.txt", "a") as f:
-        f.write(f"{timestamp}, {message}\n") 
+    with open("code_log.txt", "a") as f:
+        f.write(f"{timestamp} : {message}\n")
 
-''' Here, you define the required entities and call the relevant 
-functions in the correct order to complete the project. Note that this
-portion is not inside any function.'''
+def extract(url):
+    ''' Extracts bank name and market cap from the target Wikipedia table '''
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
 
-url = 'https://web.archive.org/web/20230902185326/https://en.wikipedia.org/wiki/List_of_countries_by_GDP_%28nominal%29'
-table_attribs = ["Country", "GDP_USD_millions"]
-db_name = 'World_Economies.db'
-table_name = 'Countries_by_GDP'
-csv_path = './Countries_by_GDP.csv'
+    tables = soup.find_all("table", {"class": "wikitable"})
+    target_table = tables[0] 
+    rows = target_table.find_all("tr")
 
-log_progress('Preliminaries complete. Initiating ETL process')
-df = extract(url, table_attribs)
-print(f"DataFrame:\n{df}") 
+    data = []
+    for row in rows[1:]:
+        cols = row.find_all("td")
+        if len(cols) >= 3:
+            bank_name = cols[1].get_text(strip=True)
+            market_cap_raw = cols[2].get_text(strip=True).replace('\n', '').replace(",", '')
+            try:
+                market_cap = float(market_cap_raw)
+                data.append({
+                    "Bank Name": bank_name,
+                    "Market Cap (US$ Billion)": market_cap
+                })
+            except ValueError:
+                continue  
+    df = pd.DataFrame(data)
+    return df
 
-log_progress('Data extraction complete. Initiating Transformation process')
-df = transform(df)
-print(f"DataFrame:\n{df}") 
-...
-print(f"DataFrame Transformed:\n{df}") 
+def transform(df, exchange_rate_csv):
+    ''' Reads exchange rates and adds converted columns rounded to 2 decimals '''
+    exchange_df = pd.read_csv(exchange_rate_csv)
+    exchange_rate = exchange_df.set_index('Currency').to_dict()['Rate']
 
-log_progress('Data transformation complete. Initiating loading process')
+    df.rename(columns={"Market Cap (US$ Billion)": "MC_USD_Billion"}, inplace=True)
+
+    df['MC_GBP_Billion'] = [np.round(x * exchange_rate['GBP'], 2) for x in df['MC_USD_Billion']]
+    df['MC_EUR_Billion'] = [np.round(x * exchange_rate['EUR'], 2) for x in df['MC_USD_Billion']]
+    df['MC_INR_Billion'] = [np.round(x * exchange_rate['INR'], 2) for x in df['MC_USD_Billion']]
+
+    df.rename(columns={"Bank Name": "Name"}, inplace=True)
+
+    return df
+
+def load_to_csv(df, path):
+    df.to_csv(path, index=False)
+
+def load_to_db(df, connection, table_name):
+    df.to_sql(table_name, connection, if_exists="replace", index=False)
+
+def run_query(query, connection):
+    print(f"Executing query:\n{query}\n")
+    result = pd.read_sql(query, connection)
+    print(result)
+
+# ------------------- ETL Pipeline -------------------
+
+url = "https://web.archive.org/web/20230908091635/https://en.wikipedia.org/wiki/List_of_largest_banks"
+csv_path = "./Largest_Banks.csv"
+banks_db = "Banks.db"
+banks_table = "Largest_banks"
+exchange_rates_file = "exchange_rate.csv"
+
+log_progress("Preliminaries complete. Initiating ETL process")
+
+# Step 1: Extract
+df = extract(url)
+log_progress("Data extraction complete.")
+
+# Step 2: Transform
+df = transform(df, exchange_rates_file)
+log_progress("Data transformation complete.")
+
+# Вивід після трансформації
+print(df.head())
+
+# Step 3: Load
 load_to_csv(df, csv_path)
-log_progress('Data saved to CSV file')
-sql_connection = sqlite3.connect('World_Economies.db')
-log_progress('SQL Connection initiated.')
-load_to_db(df, sql_connection, table_name)
-log_progress('Data loaded to Database as table. Running the query')
+log_progress("Data saved to CSV file")
 
-# Create filtered table of countries with GDP >= 100 billion
-largest_df = df[df["GDP_USD_billions"] >= 100]
-largest_df.to_sql("Largest_banks", sql_connection, if_exists='replace', index=False)
-log_progress('Table `Largest_banks` created.')
+conn = sqlite3.connect(banks_db)
+log_progress("SQL Connection initiated")
 
-# Query 1: Average GDP of large economies
-query_statement = "SELECT AVG(GDP_USD_billions) FROM Largest_banks"
-run_query(query_statement, sql_connection)
+load_to_db(df, conn, banks_table)
+log_progress("Data loaded to Database as a table, Executing queries")
 
-# Query 2: Top 5 countries by order (first 5 rows)
-query_statement = f"SELECT Country FROM {table_name} LIMIT 5"
-run_query(query_statement, sql_connection)
+# Приклади запитів
+query_all = f"""
+SELECT Name, MC_USD_Billion, MC_GBP_Billion, MC_EUR_Billion, MC_INR_Billion
+FROM {banks_table}
+LIMIT 10
+"""
+run_query(query_all, conn)
 
-# Query 3: All countries with GDP >= 100 billion
-query_statement = f"SELECT * FROM {table_name} WHERE GDP_USD_billions >= 100"
-run_query(query_statement, sql_connection)
+query_avg = f"""
+SELECT AVG(MC_GBP_Billion) as Avg_GBP_Market_Cap
 
-log_progress('Process Complete.')
-sql_connection.close()
+FROM {banks_table}
+"""
+run_query(query_avg, conn)
+
+query_5_lagest = f"""
+SELECT Name
+FROM {banks_table}
+LIMIT 5
+"""
+run_query(query_5_lagest, conn)
+
+
+conn.close()
+log_progress("Server Connection closed")
+log_progress("Process Complete")

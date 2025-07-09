@@ -1,0 +1,88 @@
+2025-Jul-09-00:44:01 : Preliminaries complete. Initiating ETL process
+2025-Jul-09-00:44:03 : Data extraction complete. Initiating Transformation process
+2025-Jul-09-00:44:03 : Data transformation complete. Initiating loading process
+2025-Jul-09-00:44:03 : Data saved to CSV file
+2025-Jul-09-00:44:03 : SQL Connection initiated.
+2025-Jul-09-00:44:03 : Data loaded to Database as table. Running the query
+2025-Jul-09-00:44:03 : Process Complete.
+2025-07-09 01:39:02, Preliminaries complete. Initiating ETL process
+2025-07-09 01:39:05, Data extraction complete. Initiating Transformation process
+2025-07-09 01:39:05, Data transformation complete. Initiating loading process
+2025-07-09 01:39:05, Data saved to CSV file
+2025-07-09 01:39:05, SQL Connection initiated.
+2025-07-09 01:39:05, Data loaded to Database as table. Running the query
+2025-07-09 01:39:05, Process Complete.
+2025-07-09 01:41:45, Preliminaries complete. Initiating ETL process
+2025-07-09 01:41:46, Data extraction complete. Initiating Transformation process
+2025-07-09 01:41:46, Data transformation complete. Initiating loading process
+2025-07-09 01:41:46, Data saved to CSV file
+2025-07-09 01:41:46, SQL Connection initiated.
+2025-07-09 01:41:46, Data loaded to Database as table. Running the query
+2025-07-09 01:41:55, Preliminaries complete. Initiating ETL process
+2025-07-09 01:41:56, Data extraction complete. Initiating Transformation process
+2025-07-09 01:41:56, Data transformation complete. Initiating loading process
+2025-07-09 01:41:56, Data saved to CSV file
+2025-07-09 01:41:56, SQL Connection initiated.
+2025-07-09 01:41:56, Data loaded to Database as table. Running the query
+2025-07-09 01:42:10, Preliminaries complete. Initiating ETL process
+2025-07-09 01:42:11, Data extraction complete. Initiating Transformation process
+2025-07-09 01:42:11, Data transformation complete. Initiating loading process
+2025-07-09 01:42:11, Data saved to CSV file
+2025-07-09 01:42:11, SQL Connection initiated.
+2025-07-09 01:42:11, Data loaded to Database as table. Running the query
+2025-07-09 01:53:55, Preliminaries complete. Initiating ETL process
+2025-07-09 01:53:59, Data extraction complete. Initiating Transformation process
+2025-07-09 01:53:59, Data transformation complete. Initiating loading process
+2025-07-09 01:53:59, Data saved to CSV file
+2025-07-09 01:53:59, SQL Connection initiated.
+2025-07-09 01:53:59, Data loaded to Database as table. Running the query
+2025-07-09 01:53:59, Table `Largest_banks` created.
+2025-07-09 01:53:59, Process Complete.
+2025-07-09 01:56:31, Preliminaries complete. Initiating ETL process
+2025-07-09 01:56:32, Data extraction complete. Initiating Transformation process
+2025-07-09 01:56:32, Data transformation complete. Initiating loading process
+2025-07-09 01:56:32, Data saved to CSV file
+2025-07-09 01:56:32, SQL Connection initiated.
+2025-07-09 01:56:32, Data loaded to Database as table. Running the query
+2025-07-09 01:56:32, Table `Largest_banks` created.
+2025-07-09 01:56:32, Process Complete.
+2025-07-09 11:29:57, Preliminaries complete. Initiating ETL process
+2025-07-09 11:30:02, Data extraction complete. Initiating Transformation process
+2025-07-09 11:30:02, Data transformation complete. Initiating loading process
+2025-07-09 11:30:02, Data saved to CSV file
+2025-07-09 11:30:02, SQL Connection initiated.
+2025-07-09 11:30:02, Data loaded to Database as table. Running the query
+2025-07-09 11:30:02, Table `Largest_banks` created.
+2025-07-09 11:30:02, Process Complete.
+2025-07-09 11:45:36, Preliminaries complete. Initiating ETL process
+2025-07-09 11:45:40, Data extraction complete. Initiating Transformation process
+2025-07-09 11:45:40, Data transformation complete. Initiating loading process
+2025-07-09 11:45:40, Data saved to CSV file
+2025-07-09 11:45:40, SQL Connection initiated.
+2025-07-09 11:45:40, Data loaded to Database as table. Running the query
+2025-07-09 11:45:40, Table `Largest_banks` created.
+2025-07-09 11:45:40, Process Complete.
+2025-07-09 11:49:18, Preliminaries complete. Initiating ETL process
+2025-07-09 11:49:20, Data extraction complete. Initiating Transformation process
+2025-07-09 11:49:20, Data transformation complete. Initiating loading process
+2025-07-09 11:49:20, Data saved to CSV file
+2025-07-09 11:49:20, SQL Connection to World_Economies.db initiated.
+2025-07-09 11:49:20, Data loaded to World_Economies.db as table Countries_by_GDP.
+2025-07-09 11:49:20, Table `Largest_banks` created in World_Economies.db.
+2025-07-09 11:49:20, SQL connection to World_Economies.db closed.
+2025-07-09 11:49:20, Initiating connection to Banks.db.
+2025-07-09 11:49:20, Data loaded to Banks.db in table Largest_banks.
+2025-07-09 11:49:20, Banks.db connection closed.
+2025-07-09 11:49:20, ETL Process Complete.
+2025-07-09 11:51:58, Preliminaries complete. Initiating ETL process
+2025-07-09 11:51:59, Data extraction complete. Initiating Transformation process
+2025-07-09 11:51:59, Data transformation complete. Initiating loading process
+2025-07-09 11:51:59, Data saved to CSV file
+2025-07-09 11:51:59, SQL Connection to World_Economies.db initiated.
+2025-07-09 11:51:59, Data loaded to World_Economies.db as table Countries_by_GDP.
+2025-07-09 11:51:59, Table `Largest_banks` created in World_Economies.db.
+2025-07-09 11:51:59, SQL connection to World_Economies.db closed.
+2025-07-09 11:51:59, Initiating connection to Banks.db.
+2025-07-09 11:52:00, Data loaded to Banks.db in table Largest_banks.
+2025-07-09 11:52:00, Banks.db connection closed.
+2025-07-09 11:52:00, ETL Process Complete.
